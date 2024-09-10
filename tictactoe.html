@@ -154,7 +154,7 @@
                 history.innerHTML += '<p><span class="material-symbols-outlined">close</span> player made a move on row '+ (Math.floor(e / 3)+1) +' and column '+ ((e % 3)+1) +'</p>'
                 p1chance = true
             }
-            t.removeAttribute('onclick')
+            t.parentElement.removeAttribute('onclick')
 
             result(check())
         }
