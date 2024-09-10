@@ -1,0 +1,267 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="The HTML5 Herald" />
+    <meta name="author" content="SitePoint" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TicTacToe</title>
+    <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <style>
+        body {
+            margin: 0px;
+            font-family: poppins;
+        }
+
+        #result>p{
+            margin: 0px;
+            display: flex;
+            align-items: center;
+        }
+
+        #result>p>span{
+            margin: 0.3rem;
+        }
+
+        .red {
+            color: red;
+        }
+
+        .grid>div {
+            background-color: #efefef;
+            border-radius: 5px;
+            min-height: 200px;
+            height: 30%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .grid>div>span {
+            font-size: 5rem;
+        }
+
+        .screen {
+            height: 600px;
+            width: 600px;
+        }
+
+        .master-screen {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .history {
+            background-color: #888888;
+            width: 600px;
+            margin-top: 2rem;
+            border-radius: 5px;
+            height: 20vh;
+            overflow-y: scroll;
+            font-family: poppins;
+            font-size: 1rem;
+        }
+
+        .history>p{
+            display: flex;
+            align-items: center;
+            margin: 1rem;
+        }
+
+        .history>p>span{
+            margin-right: 0.4rem;
+        }
+
+        .grid {
+            display: grid;
+            gap: 10px;
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        ::-webkit-scrollbar {
+            margin-right: 7px;
+            width: 7px;
+            height: 7px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            background-color: rgba(0, 0, 0, 0);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cecece;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #888;
+        }
+
+        ::-webkit-scrollbar-button:single-button {
+            background-color: rgba(64, 64, 64, 0);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="master-screen">
+        <h1>TIC TAC TOE</h1>
+        <h2 id="result"></h2>
+        <div class="screen">
+            <div id="grid" class="grid"></div>
+        </div>
+        <div class="history" id="history"></div>
+    </div>
+
+    <script>
+        let show = document.getElementById('grid')
+        let history = document.getElementById('history')
+        let resulttxt = document.getElementById('result')
+        let p1chance = true
+
+        let grid = [[-1, -1, -1], [-1, -1, -1], [-1, -1, -1]]
+        for (var i = 0; i < 3; i++) {
+            for (var j = 0; j < 3; j++) {
+                let div = document.createElement('div')
+                let span = document.createElement('span')
+                div.setAttribute('onclick', 'update(this.firstChild.id)')
+                if (grid[i][j] == -1) {
+                    span.innerHTML = ''
+                }
+                span.setAttribute('class', 'material-symbols-outlined')
+                span.setAttribute('id', (i * 3) + j)
+                div.appendChild(span)
+                show.appendChild(div)
+            }
+        }
+
+        function update(e) {
+            let t = document.getElementById(e)
+            if (p1chance) {
+                t.innerHTML = 'circle'
+                grid[Math.floor(e / 3)][e % 3] = 1
+                history.innerHTML += '<p><span class="material-symbols-outlined">circle</span> player made a move on row '+ (Math.floor(e / 3)+1) +' and column '+ ((e % 3)+1) +'</p>'
+                p1chance = false
+            }
+            else {
+                t.innerHTML = 'close'
+                grid[Math.floor(e / 3)][e % 3] = 2
+                history.innerHTML += '<p><span class="material-symbols-outlined">close</span> player made a move on row '+ (Math.floor(e / 3)+1) +' and column '+ ((e % 3)+1) +'</p>'
+                p1chance = true
+            }
+            t.parentElement.removeAttribute('onclick')
+
+            result(check())
+        }
+
+
+        function check() {
+            let rowcheck
+            let columncheck
+            let leftdiagonal = grid[0][0]
+            let rightdiagonal = grid[0][2]
+
+
+            for (var i = 0; i < 3; i++) {
+                rowcheck = grid[i][0]
+                columncheck = grid[0][i]
+                for (var j = 0; j < 3; j++) {
+                    if (grid[i][j] != rowcheck) {
+                        rowcheck = -1
+                    }
+                    if (grid[j][i] != columncheck) {
+                        columncheck = -1
+                    }
+                    if (i == j) {
+                        if (grid[i][j] != leftdiagonal) {
+                            leftdiagonal = -1
+                        }
+                    }
+                    if (i + j == 2) {
+                        if (grid[i][j] != rightdiagonal) {
+                            rightdiagonal = -1
+                        }
+                    }
+                }
+                if (rowcheck > -1) {
+                    return 'r' + i
+                }
+                else if (columncheck > -1) {
+                    return 'c' + i
+                }
+            }
+
+            if (leftdiagonal > -1) {
+                return 'dl'
+            }
+            else if (rightdiagonal > -1) {
+                return 'dr'
+            }
+            else {
+                return 'none'
+            }
+        }
+
+
+        function display() {
+            console.log('original grid')
+            for (var i = 0; i < 3; i++) {
+                for (var j = 0; j < 3; j++) {
+                    console.log(grid[i][j])
+                }
+            }
+        }
+
+        function result(a) {
+            if (a.charAt(0) == 'r') {
+                end()
+                for (var i = 0; i < 3; i++) {
+                    document.getElementById(parseInt(a.charAt(1)) * 3 + i).classList.add('red')
+                }
+            }
+            else if (a.charAt(0) == 'c') {
+                end()
+                for (var i = parseInt(a.charAt(1)); i < 9; i += 3) {
+                    document.getElementById(i).classList.add('red')
+                }
+            }
+            else if (a == 'dl') {
+                end()
+                for (var i = 0; i < 9; i += 4) {
+                    document.getElementById(i).classList.add('red')
+                }
+            }
+            else if (a == 'dr') {
+                end()
+                for (var i = 2; i < 8; i += 2) {
+                    document.getElementById(i).classList.add('red')
+                }
+            }
+        }
+
+        function end() {
+            if(p1chance){
+                resulttxt.innerHTML = '<p>PLAYER <span class="material-symbols-outlined">close</span> WON!</p>'
+            }
+            else{
+                resulttxt.innerHTML = '<p>PLAYER <span class="material-symbols-outlined">circle</span> WON!</p>'
+            }
+            for (var i = 0; i < 9; i++) {
+                for (var i = 0; i < 9; i++) {
+                    let a = document.getElementById(i)
+                    a.parentElement.removeAttribute('onclick')
+                }
+            }
+        }
+
+    </script>
+</body>
+
+</html>
